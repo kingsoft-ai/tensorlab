@@ -23,8 +23,7 @@ from tensorlab.utils.yaml_object import YamlObject
 
 class Document(YamlObject):
 
-    @property
-    def segmentation(self):
+    def segmentation_getter(self):
         # check segmentation
         if not self.has('segmentation'): return None
 
@@ -34,15 +33,14 @@ class Document(YamlObject):
 
         # parse segmentation
         s = self.__get_attr__('segmentation')
-        b = base64.decode(s)
+        b = base64.b64decode(s)
         seg = pickle.loads(b)
 
         # save cache
         self._cache['__segmentation__'] = seg
         return seg
 
-    @segmentation.setter
-    def segmentation(self, v):
+    def segmentation_setter(self, v):
         b = pickle.dumps(v)
         s = base64.b64encode(b)
         self.__set_attr__('segmentation', s)
@@ -77,14 +75,14 @@ class Document(YamlObject):
         def _find(o):
             if o.has(key): return getattr(o, key)
             v = None
-            for c in self.childs:
+            for c in o.childs:
                 v = _find(c)
                 if v is not None: break
             return v
         return _find(self)
 
 
-
+    property(segmentation_getter, segmentation_setter)
 
 
 
