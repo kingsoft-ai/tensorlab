@@ -31,9 +31,6 @@ def process_loader(name, loader, output_path):
 
 
 
-
-
-
 def transfer(args):
     # process args
     output_path = args.output_path
