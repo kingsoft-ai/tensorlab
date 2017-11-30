@@ -4,6 +4,8 @@
 #   path: picture relative path (framework set)
 #   width: picture width
 #   height: picture width
+#   seg_tag: a segmentation tag (framework set)
+#   box_tag: a box tag (framework set)
 #   objects: a array full with document
 #
 # Object:
