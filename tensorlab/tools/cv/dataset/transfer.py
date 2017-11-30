@@ -1,5 +1,4 @@
 import os
-import sys
 import argparse
 from tensorlab.tools.cv.dataset import config
 from tensorlab.tools.cv.dataset.loader import VOCLoder, COCLoder
@@ -18,11 +17,18 @@ def process_loader(name, loader, output_path):
 
     # process trains
     def process(f):
+        # get label path
         label_path = os.path.join(output_path, f)
         label_path = os.path.splitext(label_path)[0] + '.yml'
         label_dir = os.path.dirname(label_path)
         if not os.path.isdir(label_dir): os.makedirs(label_dir)
+
+        # process to doc
         doc = loader.process(f)
+        doc.dataset = name
+        doc.path = f
+
+        # save
         doc.save(label_path)
         return doc
 

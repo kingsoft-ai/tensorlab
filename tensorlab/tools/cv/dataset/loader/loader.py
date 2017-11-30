@@ -29,8 +29,3 @@ class Loader(object):
                 searches.append(relative_path)
 
         return searches
-
-
-    def _to_base64(self, v):
-        b = pickle.dumps(v)
-        return base64.b64encode(b)
