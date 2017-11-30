@@ -1,4 +1,6 @@
 import os
+import base64
+import pickle
 
 
 class Loader(object):
@@ -10,6 +12,8 @@ class Loader(object):
     def collect_train_list(self): raise NotImplementedError("collect_train_list need to implement")
 
     def collect_test_list(self): raise NotImplementedError("collect_test_list need to implement")
+
+    def process(self, file_path, doc): raise NotImplementedError("collect_test_list need to implement")
 
 
     def _search_files(self, relative_dir, exts=[]):
@@ -24,3 +28,7 @@ class Loader(object):
 
         return files
 
+
+    def _to_base64(self, v):
+        b = pickle.dumps(v)
+        return base64.b64encode(b)
