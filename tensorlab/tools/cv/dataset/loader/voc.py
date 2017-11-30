@@ -54,12 +54,14 @@ class VOCLoder(Loader):
 
     def read_segmentations(self, name):
         mask_index = []
-        seg_folder = self.root + 'VOCdevkit/VOC20%s/SegmentationClass/' % self.year
-        seg_file = seg_folder + name + '.png'
+        seg_folder = os.path.join(self.root, 'VOCdevkit/VOC20%s/SegmentationClass/' % self.year)
+        seg_file = os.path.join(seg_folder, name + '.png')
+
         seg_map = Image.open(seg_file)
-        segmentation = np.sum(np.array(seg_map, dtype=np.uint8),axis=2)
+        segmentation = np.array(seg_map, dtype=np.uint8)
         x,y = np.where(segmentation[:]>0)
-        mask_index.append((x,y))
+        [cord for cord in zip(x,y)]
+        mask_index.append([cord for cord in zip(x,y)])
         return mask_index
 
     def collect_train_list(self):
@@ -91,13 +93,13 @@ class VOCLoder(Loader):
     def process(self, file_path):
         doc = document.Document()
         objects = []
-        obj = document.Document()
-        # print(file_path)
+        obj = doc.child()
+
         filename = os.path.splitext(os.path.basename(file_path))[0]
         file_path = os.path.dirname(os.path.dirname(file_path))
 
         file_path = os.path.join(self.root, file_path, 'Annotations/%s.xml' % filename)
-        # print(file_path)
+
         with open(file_path, 'r') as f:
             bboxs, obj_name, w, h= self.read_annotations(f)
         doc.width = w
@@ -107,9 +109,9 @@ class VOCLoder(Loader):
         # for i in range(num):
         obj.box = bboxs
         obj.name = obj_name
-
-        if obj_name == f:
-            obj.segmentation = self._to_base64(self.read_segmentations(obj_name))
+        for i in range(len(self.train_seg_name)):
+            if self.train_seg_name[i] in filename:
+                obj.segmentation = self.read_segmentations(self.train_seg_name[i])
         objects.append(obj)
         doc.objects = objects
         return doc
