@@ -1,5 +1,3 @@
-# __author__ : Bean bai   CopyRight: KingSoft.cn
-
 
 from .loader import Loader
 import os
@@ -56,7 +54,9 @@ class VOCLoder(Loader):
         seg_map = Image.open(seg_file)
         segmentation = np.array(seg_map, dtype=np.uint8)
         x,y = np.where(segmentation[:]>0)
-        mask_index.append([cord for cord in zip(x,y)])
+        for cord in zip(x, y):
+            cord = tuple(cord)
+            mask_index.append(cord)
         return mask_index
 
     def collect_train_list(self):
@@ -86,7 +86,7 @@ class VOCLoder(Loader):
     def process(self, file_path):
         doc = document.Document()
         objects = []
-        obj = doc.child()
+
 
         filename = os.path.splitext(os.path.basename(file_path))[0]
         file_path = os.path.dirname(os.path.dirname(file_path))
@@ -98,11 +98,12 @@ class VOCLoder(Loader):
         doc.width = w
         doc.height = h
         assert len(bboxs) == len(obj_name),  "Wrong lable descriptions"
-        obj.box = bboxs
-        obj.name = obj_name
-        for i in range(len(self.train_seg_name)):
-            if filename == self.train_seg_name[i]:
-                obj.segmentation = self.read_segmentations(self.train_seg_name[i])
+        for i in range(len(obj_name)):
+            obj = doc.child()
+            obj.box = bboxs[i]
+            obj.name = obj_name[i]
+        if filename in self.train_seg_name:
+            obj.segmentation = self.read_segmentations(filename)
         objects.append(obj)
         doc.objects = objects
         return doc
