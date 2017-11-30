@@ -102,8 +102,8 @@ class VOCLoder(Loader):
             obj = doc.child()
             obj.box = bboxs[i]
             obj.name = obj_name[i]
-        if filename in self.train_seg_name:
-            obj.segmentation = self.read_segmentations(filename)
-        objects.append(obj)
+            if filename in self.train_seg_name:
+                pass#obj.segmentation = self.read_segmentations(filename)
+            objects.append(obj)
         doc.objects = objects
         return doc
