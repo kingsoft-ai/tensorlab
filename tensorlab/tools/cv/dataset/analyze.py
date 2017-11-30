@@ -1,14 +1,23 @@
 import os
+import select
+import sys
 import argparse
 import yaml
 import cv2
 import numpy as np
 
 
-def gen_analyzed_image(data_path, file_path):
-    # load doc
-    doc = yaml.load(file_path)
+def press_key_stop(message = None):
+    if message is not None: print(message)
+    while True:
+        if select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], []):
+            c = sys.stdin.read(1)
+            break
+        else:
+            cv2.waitKey(10)
 
+
+def gen_analyzed_image(data_path, doc):
     # load image
     image_path = os.path.join(data_path, doc.dataset, doc.path)
     image = cv2.imread(image_path)
@@ -16,14 +25,14 @@ def gen_analyzed_image(data_path, file_path):
     # get all objects
     for o in doc.objects:
         # segmentation
-        if True:
+        if o.segmentation2d is not None:
             seg2d = o.segmentation2d
             color = tuple(np.random.randint(50, 255, size=3).tolist())
             indexes = seg2d == True
             image[indexes] = color
 
         # box
-        if True:
+        if o.box is not None:
             box = o.box
             color = tuple(np.random.randint(50, 255, size=3).tolist())
             lt = (box[0], box[1])
@@ -32,6 +41,18 @@ def gen_analyzed_image(data_path, file_path):
 
     return image
 
+
+
+def show_analyzed_image(data_path, file_path):
+    # load doc
+    doc = yaml.load(file_path)
+
+    # gen image
+    image = gen_analyzed_image(data_path, doc)
+
+    # show
+    cv2.imshow(doc.path, image)
+    press_key_stop('Press key to stop')
 
 
 
@@ -48,7 +69,5 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    image = gen_analyzed_image(args.data_path, args.file_path)
-    cv2.imwrite()
-
-
+    # analyze
+    show_analyzed_image(args.data_path, args.file_path)
