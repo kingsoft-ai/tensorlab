@@ -3,14 +3,20 @@ from easydict import EasyDict as edict
 
 VOC = edict(
     name = 'VOC',
+
     year = '07',
     split = ['train','val','test']
+
 )
 
 COC = edict(
     name = 'COC'
 )
 
+
+IMAGE_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.png']
+
+DEFAULT_LABEL_PATH = 'Labels'
 
 
 CLASSIFICATION = [

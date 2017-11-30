@@ -1,19 +1,34 @@
 import os
 import sys
 import argparse
-from . import config
-from .loader import VOCLoder, COCLoder
+from tensorlab.tools.cv.dataset import config
+from tensorlab.tools.cv.dataset.loader import VOCLoder, COCLoder
+from tensorlab.tools.cv.dataset.document import Document
 
 
-
-def process_loader(loader, output_path):
+def process_loader(name, loader, output_path):
     # create output path
     if not os.path.isdir(output_path):
-        os.mkdir(output_path)
+        os.makedirs(output_path)
 
     # get trains and tests
     trains = loader.collect_train_list()
     tests = loader.collect_test_list()
+
+    # process trains
+    for f in trains:
+        doc = loader.process(f)
+
+    # process tests
+    for f in tests:
+        doc = loader.process(f)
+
+    # output file list
+    doc = Document()
+    doc.trains = trains
+    doc.tests = tests
+    doc.save(os.path.join(output_path, name) + ".yml")
+
 
 
 
@@ -23,29 +38,36 @@ def transfer(args):
     # process args
     output_path = args.output_path
     if output_path is None:
-        output_path = os.path.join(args.data_path, 'Labels')
+        output_path = os.path.join(args.data_path, config.DEFAULT_LABEL_PATH)
 
+
+    # check export dataset
+    export_all = False
+    if  args.voc == None and \
+        args.coc == None:
+        export_all = True
 
     # collect loaders
     configs = []
     loaders = []
 
-    if args.all or args.voc:
+    if export_all or args.voc:
         configs.append(config.VOC)
         loaders.append(VOCLoder)
 
-    if args.all or args.coc:
+    if export_all or args.coc:
         configs.append(config.COC)
         loaders.append(COCLoder)
 
 
+    # process loader
     for i in range(len(configs)):
         cfg = configs[i]
         loader_cls = loaders[i]
         root_path = os.path.join(args.data_path, cfg.name)
         label_path = os.path.join(output_path, cfg.name)
         loader = loader_cls(root_path, cfg)
-        process_loader(loader, label_path)
+        process_loader(cfg.name, loader, label_path)
 
 
 
@@ -58,7 +80,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="python", description="transfer cv dataset")
     parser.add_argument('--data-path', type=str, help='root path for all dataset')
     parser.add_argument('--output-path', type=str, default=None, help='root path for all dataset')
-    parser.add_argument('--all', type=str2bool, default=True, help="transfer all dataset")
     parser.add_argument('--voc', type=str2bool, default=None, help="transfer voc dataset")
     parser.add_argument('--coc', type=str2bool, default=None, help="transfer coc dataset")
 

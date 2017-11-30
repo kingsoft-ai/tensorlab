@@ -1,31 +1,24 @@
-import yaml
-from collections import OrderedDict
+from tensorlab.utils.yaml_object import YamlObject
 
-class Document(OrderedDict):
-    def __setattr__(self, key, value): self.__set_attr__(key, value)
+####################################################################################################
+# ROOT:
+#   path: picture relative path
+#   width: picture width
+#   height: picture width
+#   objects: a array full with document
+#
+# Object:
+#   name: a unique tag name of this object
+#   box: a bounding box [x, y, w, h]
+#   segmentation: a base64 encoder of segmentation described by [(x1,y1), (x2, y2) ...]
+#   pose: person pose name
 
-    def __getattr__(self, item): self.__get_attr__(item)
-
-    def __set_attr__(self, key, value):
-        if key in dict.keys(self):
-            raise Exception("repeated setting for key {}".format(key))
-        self[key] = value
-
-    def __get_attr__(self, key): return self[key]
+####################################################################################################
+class Document(YamlObject):
+    pass
 
 
 
 
-
-
-def represent_ordereddict(self, data):
-    return self.represent_mapping(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, data.items())
-
-class Dumper(yaml.Dumper):
-    def __init__(self, *args, **kwargs):
-        yaml.Dumper.__init__(self, *args, **kwargs)
-        self.add_representer(Document, type(self).represent_ordereddict)
-
-    represent_ordereddict = represent_ordereddict
 
 
