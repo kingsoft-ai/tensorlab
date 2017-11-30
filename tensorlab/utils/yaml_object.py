@@ -44,7 +44,7 @@ class YamlObject(OrderedDict):
             raise Exception("repeated setting for key {}".format(key))
         self[key] = value
 
-    def __get_attr__(self, key): return self[key]
+    def __get_attr__(self, key): return self.get(key, None)
 
     def child(self):
         child = type(self)(parent=self)

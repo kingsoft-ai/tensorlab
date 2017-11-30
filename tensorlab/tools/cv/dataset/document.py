@@ -25,6 +25,9 @@ class Document(YamlObject):
 
     @property
     def segmentation(self):
+        # check segmentation
+        if not self.has('segmentation'): return None
+
         # check cache
         if '__segmentation__' in self._cache:
             return self._cache['__segmentation__']
@@ -48,6 +51,9 @@ class Document(YamlObject):
     # generate segementation 2d image with (width, height), dtype is bool
     @property
     def segmentation2d(self):
+        # check segmentation
+        if not self.has('segmentation'): return None
+
         # check cache
         if '__segmentation2d__' in self._cache:
             return self._cache['__segmentation2d__']
