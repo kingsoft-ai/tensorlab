@@ -3,6 +3,8 @@ from easydict import EasyDict as edict
 
 VOC = edict(
     name = 'VOC',
+    year = '07',
+    split = ['train','val','test']
 )
 
 COC = edict(
