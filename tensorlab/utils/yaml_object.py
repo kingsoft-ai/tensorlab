@@ -1,5 +1,6 @@
 import yaml
 from collections import OrderedDict
+from types import MethodType
 
 def represent_ordereddict(self, data):
     return self.represent_mapping(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, data.items())
@@ -35,9 +36,17 @@ class YamlObject(OrderedDict):
     @property
     def _cache(self): return self.__dict__['__cache__']
 
-    def __setattr__(self, key, value): self.__set_attr__(key, value)
+    def __setattr__(self, key, value):
+        setter = '{}_setter'.format(key)
+        f = getattr(self, setter)
+        if type(f) is MethodType:
+            f(value)
+        else:
+            self.__set_attr__(key, value)
 
-    def __getattr__(self, item): return self.__get_attr__(item)
+    def __getattr__(self, item):
+        return self.__get_attr__(item)
+
 
     def __set_attr__(self, key, value):
         if key in dict.keys(self):
