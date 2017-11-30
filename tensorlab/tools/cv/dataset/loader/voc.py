@@ -1,3 +1,6 @@
+# __author__ : Bean bai   CopyRight: KingSoft.cn
+
+
 from .loader import Loader
 import os
 import numpy as np
@@ -24,14 +27,11 @@ class VOCLoder(Loader):
         with open(os.path.join(self.root, self.seg_filelist % (self.year, self.split[2])), 'r') as f:
             self.test_seg_lable = f.read().split('\n')[:-1]
         self.train_seg_name = self.seg_filenames1+self.seg_filenames2
-        # self.train_seg_lable = self.read_segmentations(self.train_seg_name)
-        # self.test_seg_lable = self.read_segmentations(self.seg_filenames3)
+
 
     def read_annotations(self, name):
         bboxes = []
         cats = []
-        # print('%s/VOCdevkit/VOC20%s/Annotations/%s.xml' % (self.root, self.year, name))
-        # for i in range(len(self.collect_train_list())):
         tree = ET.parse(name)
         root = tree.getroot()
         width = int(root.find('size/width').text)
@@ -45,9 +45,6 @@ class VOCLoder(Loader):
             w = int(bbox_tag.find('xmax').text)-x
             h = int(bbox_tag.find('ymax').text)-y
             bboxes.append([x, y, w, h])
-            # pose = obj.find('post').text
-
-
 
         output = bboxes, cats, width, height
         return output
@@ -56,11 +53,9 @@ class VOCLoder(Loader):
         mask_index = []
         seg_folder = os.path.join(self.root, 'VOCdevkit/VOC20%s/SegmentationClass/' % self.year)
         seg_file = os.path.join(seg_folder, name + '.png')
-
         seg_map = Image.open(seg_file)
         segmentation = np.array(seg_map, dtype=np.uint8)
         x,y = np.where(segmentation[:]>0)
-        [cord for cord in zip(x,y)]
         mask_index.append([cord for cord in zip(x,y)])
         return mask_index
 
@@ -88,8 +83,6 @@ class VOCLoder(Loader):
                 test_filenames.append(test_file)
         return test_filenames[:10]
 
-
-
     def process(self, file_path):
         doc = document.Document()
         objects = []
@@ -105,8 +98,6 @@ class VOCLoder(Loader):
         doc.width = w
         doc.height = h
         assert len(bboxs) == len(obj_name),  "Wrong lable descriptions"
-        # num = len(obj_name)
-        # for i in range(num):
         obj.box = bboxs
         obj.name = obj_name
         for i in range(len(self.train_seg_name)):
