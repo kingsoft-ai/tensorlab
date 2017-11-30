@@ -27,6 +27,8 @@ def process_loader(name, loader, output_path):
         doc = loader.process(f)
         doc.dataset = name
         doc.path = f
+        doc.seg_tag = doc.find('segmentation') is not None
+        doc.box_tag = doc.find('box') is not None
 
         # save
         doc.save(label_path)

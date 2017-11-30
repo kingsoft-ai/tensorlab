@@ -20,10 +20,14 @@ class YamlObject(OrderedDict):
         super(YamlObject, self).__init__()
         self.__dict__['__cache__'] = {}
         self.__dict__['__parent__'] = parent
+        self.__dict__['__childs__'] = []
         self.__dict__['__root__'] = None if parent is None else parent.__dict__['__root__']
 
     @property
     def parent(self): return self.__dict__['__parent__']
+
+    @property
+    def childs(self): return self.__dict__['__childs__']
 
     @property
     def root(self): return self.__dict__['__root__']
@@ -44,6 +48,7 @@ class YamlObject(OrderedDict):
 
     def child(self):
         child = type(self)(parent=self)
+        self.childs.append(child)
         return child
 
     def has(self, k): return k in dict.keys(self)

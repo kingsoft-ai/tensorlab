@@ -67,6 +67,18 @@ class Document(YamlObject):
         return image
 
 
+    def find(self, key):
+        def _find(o):
+            if o.has(key): return getattr(o, key)
+            v = None
+            for c in self.childs:
+                v = _find(c)
+                if v is not None: break
+            return v
+        return _find(self)
+
+
+
 
 
 
