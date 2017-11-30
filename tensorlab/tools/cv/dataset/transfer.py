@@ -7,6 +7,7 @@ from tensorlab.tools.cv.dataset.document import Document
 
 
 def process_loader(name, loader, output_path):
+
     # create output path
     if not os.path.isdir(output_path):
         os.makedirs(output_path)
@@ -16,12 +17,22 @@ def process_loader(name, loader, output_path):
     tests = loader.collect_test_list()
 
     # process trains
-    for f in trains:
+    def process(f):
+        label_path = os.path.join(output_path, f)
+        label_path = os.path.splitext(label_path)[0] + '.yml'
+        label_dir = os.path.dirname(label_path)
+        if not os.path.isdir(label_dir): os.makedirs(label_dir)
         doc = loader.process(f)
+        doc.save(label_path)
+        return doc
 
-    # process tests
+    train_docs = []
+    test_docs = []
+    for f in trains:
+        train_docs.append(process(f))
+
     for f in tests:
-        doc = loader.process(f)
+        test_docs.append(process(f))
 
     # output file list
     doc = Document()
