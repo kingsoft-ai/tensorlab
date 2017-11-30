@@ -3,12 +3,17 @@ from easydict import EasyDict as edict
 
 VOC = edict(
     name = 'VOC',
+    images = 'VOCdevkit/VOC2007/JPEGImages'
 )
 
 COC = edict(
     name = 'COC'
 )
 
+
+IMAGE_FILE_EXTENSIONS = ['.jpg', '.jpeg', 'png']
+
+DEFAULT_LABEL_PATH = 'Labels'
 
 
 CLASSIFICATION = [
