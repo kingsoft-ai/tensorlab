@@ -54,10 +54,15 @@ class VOCLoder(Loader):
         segmentation = np.array(seg_map, dtype=np.uint8)
         mask_index = np.zeros((segmentation.shape),dtype=np.uint16)
         x, y = np.where((segmentation[:]<255) & (segmentation[:]>0))
-        a = range(bboxs[0], bboxs[0]+bboxs[2], 1)
-        b = range(bboxs[1], bboxs[1]+bboxs[3], 1)
+        a = range(bboxs[0], bboxs[0]+bboxs[2]+1, 1)
+        b = range(bboxs[1], bboxs[1]+bboxs[3]+1, 1)
+        bbox = np.array((len(a), (len(b))))
+        c = []
+        for i in a:
+            for j in b:
+                c.append((i,j))
         for cord in zip(x,y):
-            if cord in zip(a,b):
+            if cord in c:
                 mask_index[cord] = 1
         return mask_index
 
