@@ -74,8 +74,12 @@ class Document(YamlObject):
         if len(segs) > 0:
             w, h = segs[0].shape
             im_array = np.array(segs).reshape(w, h, -1).sum(axis=2)
+            im_array[im_array == 1] = 19
+            #im_array[im_array == 0] = 255
             seg_path = os.path.splitext(path)[0] + '.png'
-            image = Image.fromarray(im_array, mode='L')
+            image = Image.fromarray(im_array, mode='P')
+            image = image.convert('P', palette=Image.ADAPTIVE,colors=256)
+            image.palette.mode = 'RGB'
             image.save(seg_path)
 
 
