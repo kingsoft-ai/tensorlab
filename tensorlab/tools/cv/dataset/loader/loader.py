@@ -13,7 +13,7 @@ class Loader(object):
 
     def collect_test_list(self): raise NotImplementedError("collect_test_list need to implement")
 
-    def process(self, file_path): raise NotImplementedError("collect_test_list need to implement")
+    def process(self, file_path, doc): raise NotImplementedError("collect_test_list need to implement")
 
 
     def _search_files(self, relative_dir, exts=[]):

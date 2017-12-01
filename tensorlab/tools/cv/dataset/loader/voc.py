@@ -5,7 +5,7 @@ import numpy as np
 import xml.etree.ElementTree as ET
 from PIL import Image
 
-from .. import config, document
+from ..document import Document
 
 
 class VOCLoder(Loader):
@@ -87,8 +87,7 @@ class VOCLoder(Loader):
                 test_filenames.append(test_file)
         return test_filenames[:10]
 
-    def process(self, file_path):
-        doc = document.Document()
+    def process(self, file_path, doc):
         objects = []
 
 
@@ -102,12 +101,15 @@ class VOCLoder(Loader):
         doc.width = w
         doc.height = h
         assert len(bboxs) == len(obj_name),  "Wrong lable descriptions"
+
         for i in range(len(obj_name)):
-            obj = doc.child()
+            obj = Document()
             obj.box = bboxs[i]
             obj.name = obj_name[i]
             if filename in self.train_seg_name:
-                obj.segmentation = self.read_segmentations(filename,bboxs[i])
+                #obj.segmentation = self.read_segmentations(filename,bboxs[i])
+                obj.segmentation = np.zeros(w, h)
+
             objects.append(obj)
         doc.objects = objects
         return doc

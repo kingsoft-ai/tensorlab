@@ -23,12 +23,20 @@ def process_loader(name, loader, output_path):
         label_dir = os.path.dirname(label_path)
         if not os.path.isdir(label_dir): os.makedirs(label_dir)
 
-        # process to doc
-        doc = loader.process(f)
+        # init doc
+        doc = Document()
         doc.dataset = name
         doc.path = f
-        doc.seg_tag = doc.find('segmentation') is not None
-        doc.box_tag = doc.find('box') is not None
+        doc.seg_tag = False
+        doc.box_tag = False
+
+        # process
+        loader.process(f, doc)
+
+        # set tag
+        doc.seg_tag = doc.search('segmentation') is not None
+        doc.box_tag = doc.search('box') is not None
+
 
         # save
         doc.save(label_path)
