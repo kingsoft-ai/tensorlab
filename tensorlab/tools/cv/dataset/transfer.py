@@ -1,4 +1,5 @@
 import os
+import shutil
 import argparse
 from tensorlab.tools.cv.dataset import config
 from tensorlab.tools.cv.dataset.loader import VOCLoder, COCLoder
@@ -9,7 +10,7 @@ def process_loader(name, loader, output_path):
 
     # recreate output path
     if os.path.isdir(output_path):
-        os.removedirs(output_path)
+        shutil.rmtree(output_path)
 
     os.makedirs(output_path)
 
