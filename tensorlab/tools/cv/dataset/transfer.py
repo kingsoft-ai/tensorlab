@@ -1,6 +1,7 @@
 import os
 import shutil
 import argparse
+import progressbar
 from tensorlab.tools.cv.dataset import config
 from tensorlab.tools.cv.dataset.loader import VOCLoder, COCLoder
 from tensorlab.tools.cv.dataset.document import Document
@@ -40,18 +41,28 @@ def process_loader(name, loader, output_path):
         doc.seg_tag = doc.search('segmentation') is not None
         doc.box_tag = doc.search('box') is not None
 
-
         # save
         doc.save(label_path)
         return doc
 
     train_docs = []
     test_docs = []
-    for f in trains:
-        train_docs.append(process(f))
+    widgets = [progressbar.FormatLabel(name), ' ',
+                progressbar.Percentage(), ' ',
+                progressbar.Bar('#'), ' ',
+                progressbar.RotatingMarker()]
+    with progressbar.ProgressBar(max_value=len(trains)+len(tests), widgets=widgets) as bar:
+        index = 0
+        for i in range(len(trains)):
+            train_docs.append(process(trains[i]))
+            bar.update(index)
+            index += 1
 
-    for f in tests:
-        test_docs.append(process(f))
+        for i in range(len(test_docs)):
+            train_docs.append(process(test_docs[i]))
+            bar.update(index)
+            index+= 1
+
 
     # output file list
     doc = Document()
