@@ -57,9 +57,11 @@ class VOCLoder(Loader):
         mid_y, mid_x = bboxs[0] + int((bboxs[2] - bboxs[0])/2), bboxs[1] + int((bboxs[3] - bboxs[1])/2)
         if segmentation[mid_x, mid_y] == 0 or 255:
             pixel = segmentation[mid_x+1, mid_y+1]
+        else:
+            pixel = segmentation[mid_x, mid_y]
         y_min, y_max, x_min, x_max = bboxs[0], bboxs[0]+bboxs[2], bboxs[1], bboxs[1]+bboxs[3]
         x,y = np.where(segmentation[x_min:x_max, y_min:y_max] == pixel)
-        for cord in zip(x+x_min,y+y_min):
+        for cord in zip(x,y):
             mask_index[cord] = i
         return mask_index
 
@@ -108,7 +110,7 @@ class VOCLoder(Loader):
             obj.name = obj_name[i]
             if filename in self.train_seg_name:
                 #obj.segmentation = self.read_segmentations(filename,bboxs[i])
-                obj.segmentation = self.read_segmentations(filename,bboxs[i],i+51)
+                obj.segmentation = self.read_segmentations(filename,bboxs[i],i)
 
             objects.append(obj)
         doc.objects = objects
