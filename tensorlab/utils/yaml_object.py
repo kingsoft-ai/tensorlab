@@ -35,6 +35,8 @@ class YamlObject(OrderedDict):
 
     def __get_attr__(self, key): return self.get(key, None)
 
+    @staticmethod
+    def load(path): return yaml.load(path)
 
     def has(self, k): return k in dict.keys(self)
 

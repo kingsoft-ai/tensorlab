@@ -10,7 +10,7 @@ def process_loader(name, loader, output_path):
     # recreate output path
     if os.path.isdir(output_path):
         os.removedirs(output_path)
-        
+
     os.makedirs(output_path)
 
     # get trains and tests
