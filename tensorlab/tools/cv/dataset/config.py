@@ -10,7 +10,8 @@ VOC = edict(
 )
 
 COC = edict(
-    name = 'COC'
+    name = 'COC',
+    split = ['train2014', 'val2014', 'test2014', 'test2015', 'minival2014', 'valminusminival2014', 'test-dev2015']
 )
 
 
