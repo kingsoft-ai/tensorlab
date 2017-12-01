@@ -35,8 +35,32 @@ class Document(YamlObject):
     def segmentation_getter(self): return self._cache.get('__segmentation__')
 
     def segmentation_setter(self, seg_image):
-        #self.__set_attr__('segmentation', seg_id)
+        seg_image = seg_image.astype(np.uint8)
         self._cache['__segmentation__'] = seg_image
+        self.__set_attr__('segmentation', seg_image.max())
+
+
+    @staticmethod
+    def load(path):
+        # load doc
+        doc = YamlObject.load(path)
+        if doc is not Document: return doc
+
+        # load segmentation
+        seg_path = os.path.splitext(path)[0] + '.png'
+        if os.path.isfile(seg_path):
+            image = Image.open(seg_path)
+            seg_docs = []
+            def _do(o):
+                if not o.has('segmentation'): return
+                seg_image = image.copy()
+                indexes = (seg_image != o.segmentation_id) & (seg_image != 0)
+                seg_image[indexes] = 0
+                o._cache['__segmentation__'] = seg_image
+
+            doc._search_docs(_do)
+
+        return doc
 
 
     def save(self, path):
@@ -53,7 +77,6 @@ class Document(YamlObject):
             seg_path = os.path.splitext(path)[0] + '.png'
             image = Image.fromarray(im_array, mode='L')
             image.save(seg_path)
-
 
 
 
@@ -103,7 +126,6 @@ class Document(YamlObject):
                     _finds(v)
 
         _finds(self)
-
 
 
     property(segmentation_getter, segmentation_setter)
