@@ -74,7 +74,7 @@ class VOCLoder(Loader):
                 val_file = 'VOCdevkit/VOC20%s/JPEGImages/%s.jpg' % (self.year, val_filename[i])
                 val_filenames.append(val_file)
         train_file = tra_filenames + val_filenames
-        return train_file[:10]
+        return train_file
 
     def collect_test_list(self):
         test_filenames = []
@@ -83,7 +83,7 @@ class VOCLoder(Loader):
             for i in range(len(test_filename)):
                 test_file = 'VOCdevkit/VOC20%s/JPEGImages/%s.jpg' % (self.year, test_filename[i])
                 test_filenames.append(test_file)
-        return test_filenames[:10]
+        return test_filenames
 
     def process(self, file_path, doc):
         objects = []
