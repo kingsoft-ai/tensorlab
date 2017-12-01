@@ -7,9 +7,11 @@ from tensorlab.tools.cv.dataset.document import Document
 
 def process_loader(name, loader, output_path):
 
-    # create output path
-    if not os.path.isdir(output_path):
-        os.makedirs(output_path)
+    # recreate output path
+    if os.path.isdir(output_path):
+        os.removedirs(output_path)
+        
+    os.makedirs(output_path)
 
     # get trains and tests
     trains = loader.collect_train_list()

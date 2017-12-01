@@ -35,8 +35,9 @@ class Document(YamlObject):
     def segmentation_getter(self): return self._cache.get('__segmentation__')
 
     def segmentation_setter(self, seg_image):
-        #self.__set_attr__('segmentation', seg_id)
+        seg_image = seg_image.astype(np.uint8)
         self._cache['__segmentation__'] = seg_image
+        self.__set_attr__('segmentation', seg_image.max())
 
 
     def save(self, path):
@@ -103,7 +104,6 @@ class Document(YamlObject):
                     _finds(v)
 
         _finds(self)
-
 
 
     property(segmentation_getter, segmentation_setter)
