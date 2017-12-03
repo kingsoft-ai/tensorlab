@@ -47,22 +47,43 @@ class VOCLoder(Loader):
         output = bboxes, cats, width, height
         return output
 
-    def read_segmentations(self, name, bboxs, i):
-        seg_folder = os.path.join(self.root, 'VOCdevkit/VOC20%s/SegmentationClass/' % self.year)
+    def read_segmentations(self, name, bboxs):
+        seg_folder = os.path.join(self.root, 'VOCdevkit/VOC20%s/SegmentationObject/' % self.year)
         seg_file = os.path.join(seg_folder, name + '.png')
         seg_map = Image.open(seg_file)
         segmentation = np.array(seg_map, dtype=np.uint8)
+        seg_copy = np.array(seg_map, dtype=np.uint8)
+        min_mask = []
+        _min = 0
+        cord_info = []
+        for i in range(len(bboxs)):
+            cord_x, cord_y = np.where(seg_copy[:] == _min)
+            min_cord_y,max_cord_y,min_cord_x, max_cord_x = np.min(cord_y), np.max(cord_y), np.min(cord_x), np.max(cord_x)
+            cord_info.append([min_cord_y,max_cord_y,min_cord_x, max_cord_x])
+            for j in zip(cord_x, cord_y):
+                seg_copy[j] = 255
+            min = np.min(seg_copy)
+            min_mask.append(min)
+            _min = min
+
+        dist = []
+        for i in range(len(cord_info)):
+            for j in range(len(bboxs)):
+                z1 = np.sqrt(np.square(cord_info[i+1][1] - bboxs[j][1]) + np.square(cord_info[i+1][3] - bboxs[j][3]))
+                z2 = np.sqrt(np.square(cord_info[i+1][0] - bboxs[j][0]) - np.square(cord_info[i+1][2] - bboxs[j][2]))
+                d = z1 + z2
+                dist.append(d)
+        cord_, bbox_ = np.where(np.min(dist))
+
         mask_index = np.zeros((segmentation.shape),dtype=np.uint16)
-        # x, y = np.where((segmentation[:]<255) & (segmentation[:]>0))
-        mid_y, mid_x = bboxs[0] + int((bboxs[2] - bboxs[0])/2), bboxs[1] + int((bboxs[3] - bboxs[1])/2)
-        if segmentation[mid_x, mid_y] == 0 or 255:
-            pixel = segmentation[mid_x+1, mid_y+1]
-        else:
-            pixel = segmentation[mid_x, mid_y]
-        y_min, y_max, x_min, x_max = bboxs[0], bboxs[0]+bboxs[2], bboxs[1], bboxs[1]+bboxs[3]
-        x,y = np.where(segmentation[x_min:x_max, y_min:y_max] == pixel)
+        # y_min, y_max, x_min, x_max = bboxs[0], bboxs[0]+bboxs[2], bboxs[1], bboxs[1]+bboxs[3]
+        min_cord_y, max_cord_y, min_cord_x, max_cord_x = cord_info[cord_]
+        x,y = np.where((segmentation[min_cord_x:max_cord_x, min_cord_y:max_cord_y]))
+        x = x + [x_min]*len(x)
+        y = y + [y_min]*len(y)
         for cord in zip(x,y):
             mask_index[cord] = i
+
         return mask_index
 
     def collect_train_list(self):
@@ -78,7 +99,7 @@ class VOCLoder(Loader):
                 val_file = 'VOCdevkit/VOC20%s/JPEGImages/%s.jpg' % (self.year, val_filename[i])
                 val_filenames.append(val_file)
         train_file = tra_filenames + val_filenames
-        return train_file[:10]
+        return train_file
 
     def collect_test_list(self):
         test_filenames = []
@@ -87,7 +108,7 @@ class VOCLoder(Loader):
             for i in range(len(test_filename)):
                 test_file = 'VOCdevkit/VOC20%s/JPEGImages/%s.jpg' % (self.year, test_filename[i])
                 test_filenames.append(test_file)
-        return test_filenames[:10]
+        return test_filenames
 
     def process(self, file_path, doc):
         objects = []
@@ -108,9 +129,9 @@ class VOCLoder(Loader):
             obj = Document()
             obj.box = bboxs[i]
             obj.name = obj_name[i]
-            if filename in self.train_seg_name:
-                #obj.segmentation = self.read_segmentations(filename,bboxs[i])
-                obj.segmentation = self.read_segmentations(filename,bboxs[i],i)
+        if filename in self.train_seg_name:
+            #obj.segmentation = self.read_segmentations(filename,bboxs[i])
+            obj.segmentation = self.read_segmentations(filename,bboxs)
 
             objects.append(obj)
         doc.objects = objects
