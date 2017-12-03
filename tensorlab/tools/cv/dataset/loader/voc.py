@@ -14,10 +14,14 @@ class VOCLoder(Loader):
         cfg = config
         self.year = cfg.year
         self.split = cfg.split
-        assert cfg.year in ['07','12'], "wrong year"
+        assert cfg.year in ['07','12'], "Wrong year for this datasets"
         self.root = root_path
         self.filelist = 'VOCdevkit/VOC20%s/ImageSets/Main/%s.txt'
         self.seg_filelist = 'VOCdevkit/VOC20%s/ImageSets/Segmentation/%s.txt'
+
+        # self.filelist = 'F:/datasets/VOC/VOCdevkit/VOC20%s/ImageSets/Main/%s.txt'
+        # self.seg_filelist = 'F:/datasets/VOC/VOCdevkit/VOC20%s/ImageSets/Segmentation/%s.txt'
+
         with open(os.path.join(self.root, self.seg_filelist % (self.year, self.split[0])), 'r') as f:
             self.seg_filenames1 = f.read().split('\n')[:-1]
         with open(os.path.join(self.root, self.seg_filelist % (self.year, self.split[1])), 'r') as f:
@@ -47,44 +51,47 @@ class VOCLoder(Loader):
         output = bboxes, cats, width, height
         return output
 
-    def read_segmentations(self, name, bboxs):
+    def read_segmentations(self, name, bboxs, obj_index):
         seg_folder = os.path.join(self.root, 'VOCdevkit/VOC20%s/SegmentationObject/' % self.year)
         seg_file = os.path.join(seg_folder, name + '.png')
         seg_map = Image.open(seg_file)
         segmentation = np.array(seg_map, dtype=np.uint8)
         seg_copy = np.array(seg_map, dtype=np.uint8)
         min_mask = []
-        _min = 0
         cord_info = []
         for i in range(len(bboxs)):
-            cord_x, cord_y = np.where(seg_copy[:] == _min)
-            min_cord_y,max_cord_y,min_cord_x, max_cord_x = np.min(cord_y), np.max(cord_y), np.min(cord_x), np.max(cord_x)
-            cord_info.append([min_cord_y,max_cord_y,min_cord_x, max_cord_x])
-            for j in zip(cord_x, cord_y):
-                seg_copy[j] = 255
-            min = np.min(seg_copy)
-            min_mask.append(min)
-            _min = min
+            _min = np.min(seg_copy)
+            if _min == 0:
+                cord_x, cord_y = np.where(seg_copy[:] == _min)
+                for j in zip(cord_x, cord_y):
+                    seg_copy[j] = 255
+            else:
+                min_mask.append(_min)
+                cord_x, cord_y = np.where(seg_copy[:] == _min)
+                min_cord_y,max_cord_y,min_cord_x, max_cord_x = np.min(cord_y), np.max(cord_y), np.min(cord_x), np.max(cord_x)
+                cord_info.append([min_cord_y,max_cord_y,min_cord_x, max_cord_x])
+                for j in zip(cord_x, cord_y):
+                    seg_copy[j] = 255
 
         dist = []
-        for i in range(len(cord_info)):
-            for j in range(len(bboxs)):
-                z1 = np.sqrt(np.square(cord_info[i+1][1] - bboxs[j][1]) + np.square(cord_info[i+1][3] - bboxs[j][3]))
-                z2 = np.sqrt(np.square(cord_info[i+1][0] - bboxs[j][0]) - np.square(cord_info[i+1][2] - bboxs[j][2]))
-                d = z1 + z2
-                dist.append(d)
-        cord_, bbox_ = np.where(np.min(dist))
-
-        mask_index = np.zeros((segmentation.shape),dtype=np.uint16)
+        y_min, y_max, x_min, x_max = bboxs[obj_index][0], bboxs[obj_index][0] + bboxs[obj_index][2], bboxs[obj_index][1], bboxs[obj_index][1] + bboxs[obj_index][3]
+        for j in range(len(cord_info)):
+            z1 = np.sqrt(np.square(cord_info[j][1] - y_max) + np.square(cord_info[j][3] - x_max))
+            z2 = np.sqrt(np.square(cord_info[j][0] - y_min) - np.square(cord_info[j][2] - x_min))
+            d = z1 + z2
+            dist.append(d)
+        right_index_bbox = np.where(dist == np.min(dist))
+        assert len(min_mask)==len(cord_info)
+        mask_seg = np.zeros((segmentation.shape),dtype=np.uint16)
         # y_min, y_max, x_min, x_max = bboxs[0], bboxs[0]+bboxs[2], bboxs[1], bboxs[1]+bboxs[3]
-        min_cord_y, max_cord_y, min_cord_x, max_cord_x = cord_info[cord_]
-        x,y = np.where((segmentation[min_cord_x:max_cord_x, min_cord_y:max_cord_y]))
+        # min_cord_y, max_cord_y, min_cord_x, max_cord_x = cord_info[cord_]
+        x,y = np.where((segmentation[x_min:x_max, y_min:y_max] == min_mask[right_index_bbox] ))
         x = x + [x_min]*len(x)
         y = y + [y_min]*len(y)
         for cord in zip(x,y):
-            mask_index[cord] = i
+            mask_seg[cord] = obj_index
 
-        return mask_index
+        return mask_seg
 
     def collect_train_list(self):
         tra_filenames, val_filenames = [], []
@@ -129,9 +136,9 @@ class VOCLoder(Loader):
             obj = Document()
             obj.box = bboxs[i]
             obj.name = obj_name[i]
-        if filename in self.train_seg_name:
-            #obj.segmentation = self.read_segmentations(filename,bboxs[i])
-            obj.segmentation = self.read_segmentations(filename,bboxs)
+            if filename in self.train_seg_name:
+                #obj.segmentation = self.read_segmentations(filename,bboxs[i])
+                obj.segmentation = self.read_segmentations(filename,bboxs, i)
 
             objects.append(obj)
         doc.objects = objects
