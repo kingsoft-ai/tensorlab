@@ -2,9 +2,9 @@ from .loader import Loader
 from pycocotools.coco import COCO
 from pycocotools import mask
 
-class COCLoder(Loader):
+class COCOLoder(Loader):
     def __init__(self, root_path, config):
-        super(COCLoder, self).__init__(root_path, config)
+        super(COCOLoder, self).__init__(root_path, config)
         cfg = config
         self.year = cfg.year
         self.split = cfg.split
