@@ -68,7 +68,7 @@ def show_analyzed_image(data_path, file_path):
             box = o.box
             lt = (box[0], box[1])
             rb = (box[0] + box[2], box[1] + box[3])
-            cv2.rectangle(image, lt, rb, color)
+            cv2.rectangle(image, lt, rb, (0, 0, 255))
 
     # show
     cv2.imshow(doc.path, image)

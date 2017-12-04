@@ -38,7 +38,7 @@ def process_loader(name, loader, output_path):
         loader.process(f, doc)
 
         # set tag
-        doc.seg_tag = doc.search('segmentation') is not None
+        doc.seg_tag = doc.search('segmentation_id') is not None
         doc.box_tag = doc.search('box') is not None
 
         # save

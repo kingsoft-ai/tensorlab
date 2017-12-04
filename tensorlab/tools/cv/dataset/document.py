@@ -94,6 +94,7 @@ class Document(YamlObject):
     def search(self, key, in_cache=False):
         result = None
         def _do(o):
+            nonlocal result
             exist = False
             if in_cache:
                 exist = key in o._cache.keys()
