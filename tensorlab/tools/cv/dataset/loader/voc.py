@@ -59,37 +59,37 @@ class VOCLoder(Loader):
         seg_copy = np.array(seg_map, dtype=np.uint8)
         min_mask = []
         cord_info = []
-        for i in range(len(bboxs)):
+        for i in range(len(bboxs)+1):
             _min = np.min(seg_copy)
             if _min == 0:
-                cord_x, cord_y = np.where(seg_copy[:] == _min)
-                for j in zip(cord_x, cord_y):
-                    seg_copy[j] = 255
+                seg_copy[seg_copy[:]==_min]=255
             else:
                 min_mask.append(_min)
                 cord_x, cord_y = np.where(seg_copy[:] == _min)
                 min_cord_y,max_cord_y,min_cord_x, max_cord_x = np.min(cord_y), np.max(cord_y), np.min(cord_x), np.max(cord_x)
                 cord_info.append([min_cord_y,max_cord_y,min_cord_x, max_cord_x])
-                for j in zip(cord_x, cord_y):
-                    seg_copy[j] = 255
+                seg_copy[seg_copy[:] == _min] = 255
 
         dist = []
         y_min, y_max, x_min, x_max = bboxs[obj_index][0], bboxs[obj_index][0] + bboxs[obj_index][2], bboxs[obj_index][1], bboxs[obj_index][1] + bboxs[obj_index][3]
         for j in range(len(cord_info)):
-            z1 = np.sqrt(np.square(cord_info[j][1] - y_max) + np.square(cord_info[j][3] - x_max))
-            z2 = np.sqrt(np.square(cord_info[j][0] - y_min) - np.square(cord_info[j][2] - x_min))
+            z1 = np.square(cord_info[j][1] - y_max) + np.square(cord_info[j][3] - x_max)
+            z2 = np.square(cord_info[j][0] - y_min) + np.square(cord_info[j][2] - x_min)
             d = z1 + z2
             dist.append(d)
-        right_index_bbox = np.where(dist == np.min(dist))
+        low = np.min(dist)
+        right_index_bbox=None
+        for i in range(len(dist)):
+            if dist[i] == low:
+                right_index_bbox = i
         assert len(min_mask)==len(cord_info)
-        mask_seg = np.zeros((segmentation.shape),dtype=np.uint16)
-        # y_min, y_max, x_min, x_max = bboxs[0], bboxs[0]+bboxs[2], bboxs[1], bboxs[1]+bboxs[3]
-        # min_cord_y, max_cord_y, min_cord_x, max_cord_x = cord_info[cord_]
-        x,y = np.where((segmentation[x_min:x_max, y_min:y_max] == min_mask[right_index_bbox] ))
-        x = x + [x_min]*len(x)
-        y = y + [y_min]*len(y)
-        for cord in zip(x,y):
-            mask_seg[cord] = obj_index
+        mask_seg = np.array(seg_map, dtype=np.uint8)
+        # x,y = np.where(segmentation[x_min:x_max, y_min:y_max] == min_mask[right_index_bbox])
+        # x = x + [x_min]*len(x)
+        # y = y + [y_min]*len(y)
+        # for cord in zip(x,y):
+        #     mask_seg[cord] = obj_index + 1
+        mask_seg[mask_seg[:]!= min_mask[right_index_bbox]] = 0
 
         return mask_seg
 
