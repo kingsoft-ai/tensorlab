@@ -107,11 +107,6 @@ def transfer(args):
         loader = loader_cls(root_path, cfg)
         process_loader(cfg.name, loader, label_path)
 
-
-
-
-
-
 if __name__ == "__main__":
 
     def str2bool(v):return v.lower() in ("yes", "true", "t", "1", True)
