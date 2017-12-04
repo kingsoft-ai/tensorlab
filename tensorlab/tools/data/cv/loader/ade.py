@@ -22,9 +22,11 @@ class ADE20KLoader(Loader):
         self.n_classes = 150
         self.files = collections.defaultdict(list)
         for split in ["training", "validation"]:
-            file_list_orignal = recursive(root_path + 'images' + split + '/', '.jpg')
-            file_list_seg = recursive(root_path + 'images' + split + '/', '.png')
-            self.files[split] = file_list_orignal + file_list_seg
+            #file_list_orignal = recursive(root_path + 'images' + split + '/', '.jpg')
+            #file_list_seg = recursive(root_path + 'images' + split + '/', '.png')
+            path = os.path.join(root_path, 'ADE20K', 'images', split)
+            file_list_orignal = self._search_files(path, ['.jpg'])
+            self.files[split] = file_list_orignal
 
     def collect_train_list(self):
 
@@ -53,6 +55,7 @@ class ADE20KLoader(Loader):
 
     def process(self,file_path,doc):
         objects = []
+        file_path = os.path.join(self.root_path, file_path)
         seg_path = file_path[:-4] + '_seg.png'
         attr_path = file_path[:-4] + '_atr.txt'
         class_names = []
@@ -69,24 +72,32 @@ class ADE20KLoader(Loader):
                     continue
         seg_map = Image.open(seg_path)
 
-        mask_image = np.array(seg_map).astype(int)
+        mask_image = np.array(seg_map,dtype=np.uint8)
         doc.width = mask_image.shape[0]
         doc.height = mask_image.shape[1]
 
         mask_image_blue = mask_image[:, :, 2]
         ins_mask = np.unique(mask_image_blue) #Blue value
         index_mask = ins_mask[1:ins_mask.size]
+
         # assert len(index_mask) == len(class_names), "class size and mask index are not matched!"
-        print(len(index_mask),len(class_names))
+        # print(len(index_mask),len(class_names))
+        # print(attr_path)
 
-        for k in range(len(class_names)):
-            obj = Document()
-            obj.box = [0,0,0,0]
-            obj.name = class_names[k]
-            obj.segmentation = mask_image_blue[mask_image_blue[:] != index_mask[k]] = 0
+        if(len(index_mask) == len(class_names)):
 
-            objects.append(obj)
-        doc.objects = objects
+            for k in range(len(class_names)):
+                obj = Document()
+                obj.name = class_names[k]
+                mask_image_blue[mask_image_blue[:] != index_mask[k]] = 0
+                # mask_seg = np.array(mask_image_blue, dtype=np.uint8)
+                obj.segmentation = mask_image_blue
+                if obj.segmentation is None: continue
+                objects.append(obj)
+
+            doc.objects = objects
+        else:
+            print('data cast！！！')
 
 
 
