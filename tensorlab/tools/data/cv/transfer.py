@@ -1,10 +1,10 @@
+import argparse
 import os
 import shutil
-import argparse
+
 import progressbar
-from tensorlab.tools.cv.dataset import config
-from tensorlab.tools.cv.dataset.loader import VOCLoder, COCLoder
-from tensorlab.tools.cv.dataset.document import Document
+from tensorlab.tools.data.cv import config
+from tensorlab.tools.data.cv.document import Document
 
 
 def process_loader(name, loader, output_path):
@@ -38,7 +38,7 @@ def process_loader(name, loader, output_path):
         loader.process(f, doc)
 
         # set tag
-        doc.seg_tag = doc.search('segmentation') is not None
+        doc.seg_tag = doc.search('segmentation_id') is not None
         doc.box_tag = doc.search('box') is not None
 
         # save
@@ -51,6 +51,7 @@ def process_loader(name, loader, output_path):
                 progressbar.Percentage(), ' ',
                 progressbar.Bar('#'), ' ',
                 progressbar.RotatingMarker()]
+
     with progressbar.ProgressBar(max_value=len(trains)+len(tests), widgets=widgets) as bar:
         index = 0
         for i in range(len(trains)):
@@ -58,8 +59,8 @@ def process_loader(name, loader, output_path):
             bar.update(index)
             index += 1
 
-        for i in range(len(test_docs)):
-            train_docs.append(process(test_docs[i]))
+        for i in range(len(tests)):
+            test_docs.append(process(tests[i]))
             bar.update(index)
             index+= 1
 
@@ -72,50 +73,47 @@ def process_loader(name, loader, output_path):
 
 
 
-def transfer(args):
+def transfer(data_path, output_path, export_tag):
     # process args
-    output_path = args.output_path
     if output_path is None:
-        output_path = os.path.join(args.data_path, config.DEFAULT_LABEL_PATH)
+        output_path = os.path.join(data_path, config.DEFAULT_LABEL_PATH)
 
-
-    # check export dataset
-    export_all = False
-    if  args.voc == None and \
-        args.coc == None:
-        export_all = True
 
     # collect loaders
-    configs = []
-    loaders = []
-
-    if export_all or args.voc:
-        configs.append(config.VOC)
-        loaders.append(VOCLoder)
-
-    if export_all or args.coc:
-        configs.append(config.COC)
-        loaders.append(COCLoder)
+    dataset_configs = []
+    for (ds_name, ds_cfg) in config.DATASETS.items():
+        if export_tag[ds_name] != True: continue
+        dataset_configs.append(ds_cfg)
 
 
     # process loader
-    for i in range(len(configs)):
-        cfg = configs[i]
-        loader_cls = loaders[i]
-        root_path = os.path.join(args.data_path, cfg.name)
+    for i in range(len(dataset_configs)):
+        cfg = dataset_configs[i]
+        loader_cls = cfg.loader
+        root_path = os.path.join(data_path, cfg.name)
         label_path = os.path.join(output_path, cfg.name)
         loader = loader_cls(root_path, cfg)
         process_loader(cfg.name, loader, label_path)
 
+
 if __name__ == "__main__":
 
+    # parse args
     def str2bool(v):return v.lower() in ("yes", "true", "t", "1", True)
     parser = argparse.ArgumentParser(prog="python", description="transfer cv dataset")
     parser.add_argument('--data-path', type=str, help='root path for all dataset')
     parser.add_argument('--output-path', type=str, default=None, help='root path for all dataset')
-    parser.add_argument('--voc', type=str2bool, default=None, help="transfer voc dataset")
-    parser.add_argument('--coc', type=str2bool, default=None, help="transfer coc dataset")
-
+    parser.add_argument('--voc', type=str2bool, default=True, help="transfer voc dataset")
+    parser.add_argument('--coco', type=str2bool, default=True, help="transfer coco dataset")
+    parser.add_argument('--ade', type=str2bool, default=True, help="transfer ade dataset")
     args = parser.parse_args()
 
-    transfer(args)
+    # data set export tag
+    ds_names = config.DATASETS.keys()
+    export_tag = {}
+    for name in ds_names:
+        export_tag[name] = getattr(args, name.lower())
+
+
+    # transfer
+    transfer(args.data_path, args.output_path, export_tag)

@@ -3,12 +3,10 @@ import collections
 import numpy as np
 import scipy.misc as m
 import scipy.io
-import matplotlib.pyplot as plt
 from PIL import Image
 from io import StringIO
 
 from .loader import Loader
-from .. import config
 from ..document import Document
 
 def recursive(root_path, suffix=''):

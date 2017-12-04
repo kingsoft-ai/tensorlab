@@ -1,18 +1,31 @@
 from easydict import EasyDict as edict
+from tensorlab.tools.data.cv.loader import VOCLoder, COCOLoder ,ADE20KLoader
 
+DATASETS = edict(
 
-VOC = edict(
-    name = 'VOC',
+    VOC = edict(
+        name = 'VOC',
+        loader = VOCLoder,
+        year = ['07','12'],
+        split = ['train','val','test']
 
-    year = '07',
-    split = ['train','val','test']
+    ),
 
+    ADE=edict(
+        name='ADE',
+        loader=ADE20KLoader,
+        split=['train', 'validation']
+
+    ),
+
+    COCO = edict(
+        name = 'COCO',
+        loader = COCOLoder,
+        split = ['train2014', 'val2014', 'test2014', 'test2015', 'minival2014', 'valminusminival2014', 'test-dev2015']
+    )
 )
 
-COC = edict(
-    name = 'COC',
-    split = ['train2014', 'val2014', 'test2014', 'test2015', 'minival2014', 'valminusminival2014', 'test-dev2015']
-)
+
 
 
 IMAGE_FILE_EXTENSIONS = ['.jpg', '.jpeg', '.png']
