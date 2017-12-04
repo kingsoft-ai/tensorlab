@@ -4,7 +4,7 @@ from easydict import EasyDict as edict
 VOC = edict(
     name = 'VOC',
 
-    year = '07',
+    year = ['07','12'],
     split = ['train','val','test']
 
 )

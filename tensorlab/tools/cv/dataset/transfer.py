@@ -58,8 +58,8 @@ def process_loader(name, loader, output_path):
             bar.update(index)
             index += 1
 
-        for i in range(len(test_docs)):
-            train_docs.append(process(test_docs[i]))
+        for i in range(len(tests)):
+            train_docs.append(process(tests[i]))
             bar.update(index)
             index+= 1
 
