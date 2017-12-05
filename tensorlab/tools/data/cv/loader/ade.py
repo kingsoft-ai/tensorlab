@@ -88,10 +88,11 @@ class ADE20KLoader(Loader):
 
             for k in range(len(class_names)):
                 obj = Document()
+                seg_mask = mask_image_blue.copy()
                 obj.name = class_names[k]
-                mask_image_blue[mask_image_blue[:] != index_mask[k]] = 0
+                seg_mask[mask_image_blue[:] != index_mask[k]] = 0
                 # mask_seg = np.array(mask_image_blue, dtype=np.uint8)
-                obj.segmentation = mask_image_blue
+                obj.segmentation = seg_mask
                 if obj.segmentation is None: continue
                 objects.append(obj)
 
