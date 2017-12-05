@@ -106,6 +106,7 @@ if __name__ == "__main__":
     parser.add_argument('--voc', type=str2bool, default=True, help="transfer voc dataset")
     parser.add_argument('--coco', type=str2bool, default=True, help="transfer coco dataset")
     parser.add_argument('--ade', type=str2bool, default=True, help="transfer ade dataset")
+    parser.add_argument('--cityscapes', type=str2bool, default=True, help="transfer cityscapes dataset")
     args = parser.parse_args()
 
     # data set export tag

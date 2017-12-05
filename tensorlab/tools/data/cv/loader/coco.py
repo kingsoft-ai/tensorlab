@@ -1,6 +1,6 @@
 from .loader import Loader
-from pycocotools.coco import COCO
-from pycocotools import mask
+# from pycocotools.coco import COCO
+# from pycocotools import mask
 import numpy as np
 import os
 from ..document import Document
