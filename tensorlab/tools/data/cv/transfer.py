@@ -103,9 +103,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="python", description="transfer cv dataset")
     parser.add_argument('--data-path', type=str, help='root path for all dataset')
     parser.add_argument('--output-path', type=str, default=None, help='root path for all dataset')
-    parser.add_argument('--voc', type=str2bool, default=True, help="transfer voc dataset")
-    parser.add_argument('--coco', type=str2bool, default=True, help="transfer coco dataset")
-    parser.add_argument('--ade', type=str2bool, default=True, help="transfer ade dataset")
+    parser.add_argument('--voc', type=str2bool, default=False, help="transfer voc dataset")
+    parser.add_argument('--coco', type=str2bool, default=False, help="transfer coco dataset")
+    parser.add_argument('--ade', type=str2bool, default=False, help="transfer ade dataset")
     args = parser.parse_args()
 
     # data set export tag
