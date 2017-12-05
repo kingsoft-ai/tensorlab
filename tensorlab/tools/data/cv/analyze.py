@@ -1,11 +1,13 @@
+import argparse
 import os
 import select
 import sys
-import argparse
+
 import cv2
 import numpy as np
-from tensorlab.tools.cv.dataset.document import Document
+
 from tensorlab.image import DEFAULT_PALETTE_COLOR_256
+from tensorlab.tools.data.cv.document import Document
 
 
 def press_key_stop(message = None):
@@ -68,7 +70,7 @@ def show_analyzed_image(data_path, file_path):
             box = o.box
             lt = (box[0], box[1])
             rb = (box[0] + box[2], box[1] + box[3])
-            cv2.rectangle(image, lt, rb, color)
+            cv2.rectangle(image, lt, rb, (0, 0, 255))
 
     # show
     cv2.imshow(doc.path, image)

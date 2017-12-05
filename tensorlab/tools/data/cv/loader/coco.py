@@ -5,9 +5,10 @@ import numpy as np
 import os
 from ..document import Document
 
-class COCLoder(Loader):
+
+class COCOLoder(Loader):
     def __init__(self, root_path, config):
-        super(COCLoder, self).__init__(root_path, config)
+        super(COCOLoder, self).__init__(root_path, config)
         cfg = config
         self.split_train = cfg.split_train
         self.split_test = cfg.split_test
@@ -92,8 +93,8 @@ class COCLoder(Loader):
             obj.box = bboxs[i]
             obj.name = obj_name[i]
 
-            if filename in self.train_seg_name + self.test_seg_lable:
-                obj.segmentation = self.read_segmentations(seg_dirpath, bboxs, i)
+            # if filename in self.train_seg_name + self.test_seg_lable:
+            #     obj.segmentation = self.read_segmentations(seg_dirpath, bboxs, i)
 
             objects.append(obj)
         doc.objects = objects
