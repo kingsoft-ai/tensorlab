@@ -30,7 +30,7 @@ DATASETS = edict(
     COCO = edict(
         name = 'COCO',
         loader = COCOLoder,
-        split = [['train2014', 'val2014'],['test2014', 'test2015']]  #separate training and testing datasets, using 2-d matrix , 0:training & valadation  1:testing
+        split = [['train2014', 'val2014'],['test2014']]  #separate training and testing datasets, using 2-d matrix , 0:training & valadation  1:testing
     )
 )
 

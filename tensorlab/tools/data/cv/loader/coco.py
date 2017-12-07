@@ -36,7 +36,17 @@ class COCOLoder(Loader):
         self.test_json = '%s/annotations/image_info_%s.json'
         self.train_json = '%s/annotations/instances_%s.json'
 
+        # self.train_coco = COCO(self.train_json % (self.root, self.split[0]))
+        # self.test_coco = COCO(self.train_json % (self.root, self.split[1]))
+        self.train_cocos = []
+        self.test_cocos = []
 
+        for i in range(len(self.split[0])):
+            coco_a = COCO(self.train_json % (self.root, self.split[0][i]))
+            self.train_cocos.append(coco_a)
+        for j in range(len(self.split[1])):
+            coco_b = COCO(self.test_json % (self.root, self.split[1][j]))
+            self.test_cocos.append(coco_b)
     #get annotation info
     def _get_coco_annotations(self, img_id, coco, only_instances=True):
         iscrowd = False if only_instances else None
@@ -80,46 +90,43 @@ class COCOLoder(Loader):
     def collect_train_list(self):
         file_paths = []
         path = '%s/%s'
-        for i in range(len(self.split[0])):
-            coco = COCO(self.train_json % (self.root, self.split[0][i]))
-            self.train_filenames = coco.getImgIds()
-            self.img = coco.loadImgs(self.train_filenames)
+        for i in range(len(self.train_cocos)):
+            # coco = COCO(self.train_json % (self.root, self.split[0][i]))
+            self.train_filenames = self.train_cocos[i].getImgIds()
+            self.img = self.train_cocos[i].loadImgs(self.train_filenames)
             for j in range(len(self.img)):
-            # for j in range(10):
                 file_path = path % (self.split[0][i], self.img[j]['file_name'])
                 file_paths.append(file_path)
         return file_paths
 
     def collect_test_list(self):
-
         file_paths = []
-        # path = '%s/%s'
-        # for i in range(len(self.split[1])):
-        #     coco = COCO(self.test_json % (self.root, self.split[1][i]))
-        #     test_filenames = coco.getImgIds()
-        #     name = coco.loadImgs(test_filenames)
-        #     for j in range(len(name)):
-        #         file_path = path % (self.split[1][i], name[j]['file_name'])
-        #         file_paths.append(file_path)
+        path = '%s/%s'
+        for i in range(len(self.test_cocos)):
+            # coco = COCO(self.test_json % (self.root, self.split[1][i]))
+            test_filenames = self.test_cocos[i].getImgIds()
+            name = self.test_cocos[i].loadImgs(test_filenames)
+            for j in range(len(name)):
+                file_path = path % (self.split[1][i], name[j]['file_name'])
+                file_paths.append(file_path)
 
         return file_paths
 
     def process(self, file_path, doc):
-
         objects = []
         name = os.path.splitext(os.path.split(file_path)[-1])[0]
+        id = str(name).split('_')[-1]
+        id = int(id)
         year = str(name).split('_')[1]
-        if year in self.split[0][:]:
-            coco = COCO(self.train_json % (self.root, year))
-            id = str(name).split('_')[-1]
-            id = int(id)
-        elif year in self.split[1][:]:
-            coco = COCO(self.test_json % (self.root, year))
-            id = str(name).split('_')[-1].split('0')[-1]
-            id = int(id)
-        else:
-            print('year of coco datasets was wrong')
-        bboxs, obj_names, w, h, segmentations = self.read_annotations(id, coco)
+        for i in range(len(self.train_cocos)):
+            if year == self.split[0][i]:
+                bboxs, obj_names, w, h, segmentations = self.read_annotations(id, self.train_cocos[i])
+
+        for j in range(len(self.test_cocos)):
+            if year == self.split[1][j]:
+                bboxs, obj_names, w, h, segmentations = self.read_annotations(id, self.test_coco)
+
+
         doc.wight = w
         doc.height = h
         assert len(bboxs) == len(obj_names), 'Wrong lable descriptions'
