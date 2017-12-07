@@ -68,8 +68,8 @@ def show_analyzed_image(data_path, file_path):
         # box
         if o.box is not None:
             box = o.box
-            lt = (box[0], box[1])
-            rb = (box[0] + box[2], box[1] + box[3])
+            lt = (int(box[0]), int(box[1]))
+            rb = (int(box[0]) + int(box[2]), int(box[1]) + int(box[3]))
             cv2.rectangle(image, lt, rb, (0, 0, 255))
 
     # show

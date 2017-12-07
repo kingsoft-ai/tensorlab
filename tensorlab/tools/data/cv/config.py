@@ -1,5 +1,5 @@
 from easydict import EasyDict as edict
-from tensorlab.tools.data.cv.loader import VOCLoder, COCOLoder
+from tensorlab.tools.data.cv.loader import VOCLoder, COCOLoder ,ADE20KLoader,CityScapesLoader
 
 DATASETS = edict(
 
@@ -11,10 +11,26 @@ DATASETS = edict(
 
     ),
 
+    ADE=edict(
+        name='ADE',
+        loader=ADE20KLoader,
+        split=['train', 'validation']
+
+    ),
+
+    CityScapes=edict(
+        name='CityScapes',
+        loader=CityScapesLoader,
+        split=['train', 'val', 'test'],
+        background_color=0,
+        color_index_init=1
+
+    ),
+
     COCO = edict(
         name = 'COCO',
         loader = COCOLoder,
-        split = ['train2014', 'val2014', 'test2014', 'test2015', 'minival2014', 'valminusminival2014', 'test-dev2015']
+        split = [['train2014', 'val2014'],['test2014']]  #separate training and testing datasets, using 2-d matrix , 0:training & valadation  1:testing
     )
 )
 
