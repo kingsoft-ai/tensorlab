@@ -1,15 +1,11 @@
 import os
 import collections
 import numpy as np
+
 from PIL import Image
 
 from .loader import Loader
 from ..document import Document
-
-def recursive(root_path, suffix=''):
-    return [os.path.join(looproot, filename)
-            for looproot, _, filenames in os.walk(root_path)
-            for filename in filenames if filename.endswith(suffix)]
 
 class ADE20KLoader(Loader):
     def __init__(self, root_path, config):

@@ -78,7 +78,7 @@ class VOCLoder(Loader):
                 right_index_bbox = i
         assert len(min_mask)==len(cord_info)
         segmentation = np.array(seg_map, dtype=np.uint8)
-        print('image name: {}, min_mask:{}, dist:{}, cord_info{}'.format(seg_file, min_mask, dist, cord_info))
+        # print('image name: {}, min_mask:{}, dist:{}, cord_info{}'.format(seg_file, min_mask, dist, cord_info))
         # x,y = np.where(segmentation[x_min:x_max, y_min:y_max] == min_mask[right_index_bbox])
         # x = x + [x_min]*len(x)
         # y = y + [y_min]*len(y)
