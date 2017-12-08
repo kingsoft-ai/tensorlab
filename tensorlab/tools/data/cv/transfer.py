@@ -8,7 +8,6 @@ from tensorlab.tools.data.cv.document import Document
 
 
 def process_loader(name, loader, output_path):
-
     # recreate output path
     if os.path.isdir(output_path):
         shutil.rmtree(output_path)
@@ -67,8 +66,8 @@ def process_loader(name, loader, output_path):
 
     # output file list
     doc = Document()
-    doc.trains = trains
-    doc.tests = tests
+    doc.trains = [os.path.splitext(p)[0] + '.yml' for p in trains]
+    doc.tests = [os.path.splitext(p)[0] + '.yml' for p in tests]
     doc.save(os.path.join(output_path, name) + ".yml")
 
 
@@ -101,11 +100,13 @@ if __name__ == "__main__":
     # parse args
     def str2bool(v):return v.lower() in ("yes", "true", "t", "1", True)
     parser = argparse.ArgumentParser(prog="python", description="transfer cv dataset")
-    parser.add_argument('--data-path', type=str, help='root path for all dataset')
+    parser.add_argument('--data-path', type=str, required=True, help='root path for all dataset')
     parser.add_argument('--output-path', type=str, default=None, help='root path for all dataset')
-    parser.add_argument('--voc', type=str2bool, default=False, help="transfer voc dataset")
-    parser.add_argument('--coco', type=str2bool, default=False, help="transfer coco dataset")
-    parser.add_argument('--ade', type=str2bool, default=False, help="transfer ade dataset")
+    parser.add_argument('--voc', type=str2bool, default=True, help="transfer voc dataset")
+    parser.add_argument('--coco', type=str2bool, default=True, help="transfer coco dataset")
+    parser.add_argument('--ade', type=str2bool, default=True, help="transfer ade dataset")
+    parser.add_argument('--cityscapes', type=str2bool, default=True, help="transfer cityscapes dataset")
+
     args = parser.parse_args()
 
     # data set export tag

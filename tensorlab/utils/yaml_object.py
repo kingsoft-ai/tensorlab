@@ -76,6 +76,9 @@ class YamlObject(OrderedDict):
         return self.__get_attr__(item)
 
 
+    def __setstate__(self, state): self.__dict__.update(state)
+
+
     def __set_attr__(self, key, value):
         self[key] = value
 

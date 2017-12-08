@@ -85,7 +85,7 @@ if __name__ == "__main__":
 
     def str2bool(v):return v.lower() in ("yes", "true", "t", "1", True)
     parser = argparse.ArgumentParser(prog="python", description="transfer cv dataset")
-    parser.add_argument('--data-path', type=str, help='dataset path')
+    parser.add_argument('--data-path', type=str, required=True, help='dataset path')
     parser.add_argument('--file-path', type=str, help='label file path')
     parser.add_argument('--output-path', type=str, default=os.curdir, help='root path for all dataset')
 
