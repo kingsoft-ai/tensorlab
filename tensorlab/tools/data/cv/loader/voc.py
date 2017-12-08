@@ -147,8 +147,8 @@ class VOCLoder(Loader):
         objects = []
         filename = os.path.splitext(os.path.basename(file_path))[0]
         file_path = os.path.dirname(os.path.dirname(file_path))
-        seg_dirpath = os.path.join(self.root, 'VOCdevkit/VOC2012/', 'SegmentationObject/%s.png' % '2009_004969')
-        ann_dir_path = os.path.join(self.root, 'VOCdevkit/VOC2012/', 'Annotations/%s.xml' % '2009_004969')
+        seg_dirpath = os.path.join(self.root, file_path, 'SegmentationObject/%s.png' % filename)
+        ann_dir_path = os.path.join(self.root, file_path, 'Annotations/%s.xml' % filename)
 
         with open(ann_dir_path, 'r') as f:
             bboxs, obj_name, w, h= self.read_annotations(f)
