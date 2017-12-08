@@ -25,8 +25,6 @@ def evaluation(args):
             gt = os.path.splitext(os.path.split(j)[-1])[0]
             gt_files.append(gt)
 
-
-
     for i in range(len(p_files)):
         if p_files[i] in gt_files:
             pred = Image.open(os.path.join(args.pred_path, '%s.png' % p_files[i]))
@@ -44,10 +42,12 @@ def evaluation(args):
 
             #compare
             compare = pred_piexl - label_piexl
-            if np.min(compare) == np.max(compare) == 0:
+            if np.min(compare) == 0 and np.max(compare) == 0:
                 verify = True
             else:
                 print("pred image was not match groundtruth, pred abspath is %s" % os.path.join(args.pred_path, '%s.png' % p_files[i]))
+        else:
+            print('wrong data path')
 
     return verify
 

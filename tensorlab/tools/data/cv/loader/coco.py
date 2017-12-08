@@ -61,8 +61,8 @@ class COCOLoder(Loader):
         for i in range(len(anns)):
             cat = coco_ids_to_cats[anns[i]['category_id']]
             cats.append(cat)
-            bboxe = anns[i]['bbox']
-            bboxes.append(bboxe)
+            bbox = anns[i]['bbox']
+            bboxes.append(bbox)
             mask = self._read_segmentation(anns[i], h, w)
             mask[mask[:]> 0] = i+1
             masks.append(mask)
@@ -91,7 +91,6 @@ class COCOLoder(Loader):
         file_paths = []
         path = '%s/%s'
         for i in range(len(self.train_cocos)):
-            # coco = COCO(self.train_json % (self.root, self.split[0][i]))
             self.train_filenames = self.train_cocos[i].getImgIds()
             self.img = self.train_cocos[i].loadImgs(self.train_filenames)
             for j in range(len(self.img)):
@@ -103,7 +102,6 @@ class COCOLoder(Loader):
         file_paths = []
         path = '%s/%s'
         for i in range(len(self.test_cocos)):
-            # coco = COCO(self.test_json % (self.root, self.split[1][i]))
             test_filenames = self.test_cocos[i].getImgIds()
             name = self.test_cocos[i].loadImgs(test_filenames)
             for j in range(len(name)):
@@ -124,8 +122,7 @@ class COCOLoder(Loader):
 
         for j in range(len(self.test_cocos)):
             if year == self.split[1][j]:
-                bboxs, obj_names, w, h, segmentations = self.read_annotations(id, self.test_coco)
-
+                bboxs, obj_names, w, h, segmentations = self.read_annotations(id, self.test_cocos[j])
 
         doc.wight = w
         doc.height = h
