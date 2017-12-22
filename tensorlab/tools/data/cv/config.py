@@ -1,5 +1,5 @@
 from easydict import EasyDict as edict
-from tensorlab.tools.data.cv.loader import VOCLoder, COCOLoder ,ADE20KLoader,CityScapesLoader
+from tensorlab.tools.data.cv.loader import VOCLoder, COCOLoder , ADE20KLoader, CityScapesLoader, MapillaryLoader
 
 DATASETS = edict(
 
@@ -31,6 +31,12 @@ DATASETS = edict(
         name = 'COCO',
         loader = COCOLoder,
         split = [['train2014', 'val2014'],['test2014']]  #separate training and testing datasets, using 2-d matrix , 0:training & valadation  1:testing
+    ),
+
+    Mapillary = edict(
+        name = 'Mapillary',
+        loader = MapillaryLoader,
+        split = ['training', 'validation']
     )
 )
 
