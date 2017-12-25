@@ -106,6 +106,7 @@ if __name__ == "__main__":
     parser.add_argument('--coco', type=str2bool, default=True, help="transfer coco dataset")
     parser.add_argument('--ade', type=str2bool, default=True, help="transfer ade dataset")
     parser.add_argument('--cityscapes', type=str2bool, default=True, help="transfer cityscapes dataset")
+    parser.add_argument('--mapillary', type=str2bool, default=True, help="transfer mapillary dataset")
 
     args = parser.parse_args()
 
